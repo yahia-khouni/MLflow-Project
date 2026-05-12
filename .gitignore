@@ -1,0 +1,43 @@
+# Environment variables (contains secrets!)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Scala / SBT
+training/target/
+training/project/target/
+training/project/project/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.metals/
+.bloop/
+.bsp/
+
+# Data files (too large for Git)
+data/*.csv
+
+# Docker volumes
+postgres-data/
+minio-data/
+grafana-data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test & coverage reports
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Compiled artifacts
+*.class
+*.jar

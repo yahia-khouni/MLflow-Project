@@ -1,0 +1,23 @@
+# ============================================================
+# Grafana Datasource — Auto-provisioned
+# ============================================================
+# This file tells Grafana: "On startup, automatically connect
+# to Prometheus. No manual setup needed in the UI."
+#
+# It's like having a .env file that pre-configures your
+# database connection — Grafana reads this and sets up the
+# datasource without you clicking anything.
+# ============================================================
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: "15s"
+      httpMethod: POST
