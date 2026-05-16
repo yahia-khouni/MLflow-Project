@@ -1,0 +1,23 @@
+{
+  "algorithm": "Gradient Boosted Trees",
+  "num_cv_folds": 5,
+  "train_test_split": "80/20",
+  "param_grid": [
+    {
+      "maxIter": "20",
+      "maxDepth": "3"
+    },
+    {
+      "maxIter": "50",
+      "maxDepth": "3"
+    },
+    {
+      "maxIter": "20",
+      "maxDepth": "5"
+    },
+    {
+      "maxIter": "50",
+      "maxDepth": "5"
+    }
+  ]
+}

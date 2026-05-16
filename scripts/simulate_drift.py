@@ -186,7 +186,7 @@ def main():
     print(f"    Avg probability: {avg_normal_prob:.3f}")
 
     # Pause to let the baseline settle in Grafana
-    print(f"\n  ⏸️  Pausing 5 seconds to establish baseline in Grafana...")
+    print(f"\n  [PAUSE] Pausing 5 seconds to establish baseline in Grafana...")
     time.sleep(5)
 
     # --- Phase 2: Drifted requests ---
@@ -215,7 +215,7 @@ def main():
     print(f"  {'Churn rate':<25} {n_churn/max(n_success,1)*100:>9.1f}% {d_churn/max(d_success,1)*100:>9.1f}%")
     print(f"  {'Avg probability':<25} {avg_normal_prob:>10.3f} {avg_drift_prob:>10.3f} {avg_drift_prob-avg_normal_prob:>+10.3f}")
     print()
-    print("  👀 Check Grafana now! You should see:")
+    print("  >> Check Grafana now! You should see:")
     print("     - Churn probability distribution shifted right")
     print("     - Higher churn prediction rate in the second half")
     print("     - Possible change in confidence level distribution")

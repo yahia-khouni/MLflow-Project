@@ -62,9 +62,14 @@ object DataLoader {
       // Drop customerID — it's just an ID, not a predictive feature
       // Like removing _id from a MongoDB document before analysis
       .drop("customerID")
+      // Filter to only valid Churn values — some rows may have empty
+      // strings or spaces which would create a 3rd label class and
+      // break the BinaryClassificationEvaluator
+      .filter(col("Churn").isin("Yes", "No"))
 
     println("  ✅ TotalCharges converted to Double (spaces → 0.0)")
     println("  ✅ customerID column dropped")
+    println(s"  ✅ Filtered to valid Churn values (Yes/No): ${cleanedDf.count()} rows")
 
     cleanedDf
   }

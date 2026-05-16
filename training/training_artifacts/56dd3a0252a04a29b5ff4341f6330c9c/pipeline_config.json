@@ -1,0 +1,11 @@
+{
+  "algorithm": "Random Forest",
+  "num_cv_folds": 5,
+  "train_test_split": "80/20",
+  "param_grid": [
+    {
+      "numTrees": "50",
+      "maxDepth": "5"
+    }
+  ]
+}

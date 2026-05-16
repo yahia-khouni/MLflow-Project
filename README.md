@@ -5,6 +5,44 @@
 
 ---
 
+## 📸 Project Screenshots
+
+### Grafana — Real-Time Monitoring Dashboard
+> 10-panel dashboard tracking request rate, latency, error rate, churn predictions, probability distribution, and model confidence — all in real-time.
+
+![Grafana Dashboard](screenshots/grafana_dashboard.png)
+
+---
+
+### MLflow — Experiment Tracking
+> All training runs for 3 algorithms (Logistic Regression, Random Forest, Gradient Boosted Trees) with metrics, parameters, and artifacts logged automatically.
+
+![MLflow Experiments](screenshots/mlflow_experiments.png)
+
+---
+
+### MLflow — Model Registry
+> Champion model (`churn-predictor`) registered, tagged, and promoted to **Production** with full version history and stage transitions.
+
+![MLflow Model Registry](screenshots/mlflow_model_registry.png)
+
+---
+
+### FastAPI — Interactive API Documentation (Swagger)
+> 5 REST endpoints with interactive documentation, input validation via Pydantic schemas, and live testing capability.
+
+![FastAPI Swagger](screenshots/fastapi_swagger.png)
+
+---
+
+### FastAPI — Health Check Endpoint
+> Real-time API health status showing model version, uptime, and MLflow connection status.
+
+![API Health](screenshots/api_health.png)
+
+---
+
+
 ## 🏗️ Architecture Overview
 
 ```

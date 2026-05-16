@@ -65,6 +65,11 @@ object Main {
     // .master("local[*]") = use all CPU cores on this machine
     // In production, you'd use "spark://spark-master:7077"
     // ============================================================
+
+    // Set HADOOP_HOME before creating SparkSession to avoid winutils errors
+    val hadoopDir = new java.io.File("../hadoop").getAbsolutePath
+    System.setProperty("hadoop.home.dir", hadoopDir)
+
     println("\n" + "=" * 60)
     println("INITIALIZING SPARK")
     println("=" * 60)
@@ -168,8 +173,8 @@ object Main {
       .setSeed(42)
 
     val rfParamGrid = new ParamGridBuilder()
-      .addGrid(rf.numTrees, Array(50, 100, 200))    // number of trees in the forest
-      .addGrid(rf.maxDepth, Array(5, 10, 15))        // how deep each tree can grow
+      .addGrid(rf.numTrees, Array(50))           // reduced grid for speed
+      .addGrid(rf.maxDepth, Array(5))              // reduced grid for speed
       .build()
 
     results += Trainer.trainAndLog(
@@ -189,8 +194,8 @@ object Main {
       .setSeed(42)
 
     val gbtParamGrid = new ParamGridBuilder()
-      .addGrid(gbt.maxIter, Array(50, 100, 150))    // number of boosting rounds
-      .addGrid(gbt.maxDepth, Array(5, 8, 10))        // tree depth
+      .addGrid(gbt.maxIter, Array(20, 50))            // number of boosting rounds
+      .addGrid(gbt.maxDepth, Array(3, 5))             // tree depth (keep shallow for speed)
       .build()
 
     results += Trainer.trainAndLog(
@@ -222,12 +227,12 @@ object Main {
     // ============================================================
     val modelName = "churn-predictor"
     val versionNum = ModelRegistry.registerChampion(
-      mlflowClient, champion.runId, modelName, champion
+      mlflowUri, champion.runId, modelName, champion
     )
 
     // Validate and promote to Production (AUC > 0.80)
     ModelRegistry.promoteToProduction(
-      mlflowClient, modelName, versionNum, champion.aucRoc
+      mlflowUri, modelName, versionNum, champion.aucRoc
     )
 
     // ============================================================

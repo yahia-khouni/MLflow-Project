@@ -128,10 +128,10 @@ object Trainer {
       .setEstimator(pipeline)
       .setEvaluator(evaluator)
       .setEstimatorParamMaps(paramGrid)
-      .setNumFolds(5)
-      .setParallelism(2)  // try 2 param combos in parallel
+      .setNumFolds(3)       // 3 folds is sufficient for this dataset size
+      .setParallelism(2)    // try 2 param combos in parallel
 
-    println(s"  CrossValidator: 5 folds × ${paramGrid.length} param combos = ${5 * paramGrid.length} fits")
+    println(s"  CrossValidator: 3 folds × ${paramGrid.length} param combos = ${3 * paramGrid.length} fits")
     println("  Training... (this may take a few minutes)")
 
     // --- FIT (train) the model ---
@@ -192,11 +192,79 @@ object Trainer {
     generatePipelineConfig(algorithmName, paramGrid, runArtifactDir)
     mlflowClient.logArtifact(runId, new File(runArtifactDir, "pipeline_config.json"))
 
-    // Save the Spark ML model to disk, then log as artifact
-    val modelPath = s"$artifactDir/$runId/spark-model"
-    bestModel.write.overwrite().save(modelPath)
-    mlflowClient.logArtifacts(runId, new File(modelPath), "model")
-    println("  ✅ Artifacts logged to MLflow (plots, CSV, JSON, model)")
+    // Save model summary as JSON artifact
+    val modelSummary = new java.util.LinkedHashMap[String, Object]()
+    modelSummary.put("algorithm", algorithmName)
+    modelSummary.put("run_id", runId)
+    modelSummary.put("auc_roc", java.lang.Double.valueOf(aucRoc))
+    modelSummary.put("accuracy", java.lang.Double.valueOf(accuracy))
+    modelSummary.put("f1_score", java.lang.Double.valueOf(f1Score))
+    modelSummary.put("training_seconds", java.lang.Double.valueOf(durationSec))
+    modelSummary.put("pipeline_stages", java.lang.Integer.valueOf(bestModel.stages.length))
+    val summaryGson = new GsonBuilder().setPrettyPrinting().create()
+    val summaryPw = new PrintWriter(new File(runArtifactDir, "model_summary.json"))
+    summaryPw.print(summaryGson.toJson(modelSummary))
+    summaryPw.close()
+    mlflowClient.logArtifact(runId, new File(runArtifactDir, "model_summary.json"))
+
+    // --- Save actual Spark model and log to MLflow ---
+    // We save to a local temp directory, then upload via logArtifacts().
+    // This avoids the Hadoop/winutils dependency for the HDFS FileSystem
+    // but still gives us a real model artifact in MinIO that FastAPI can load.
+    try {
+      val modelTempDir = new File(s"$artifactDir/model_tmp_$algorithmName")
+      val sparkModelDir = new File(modelTempDir, "sparkml")
+
+      // Clean up any previous save
+      if (modelTempDir.exists()) {
+        def deleteRecursively(f: File): Unit = {
+          if (f.isDirectory) f.listFiles().foreach(deleteRecursively)
+          f.delete()
+        }
+        deleteRecursively(modelTempDir)
+      }
+
+      // Save the PipelineModel locally using Spark's built-in serialization
+      // Setting hadoop.home.dir to the project directory to avoid winutils error
+      System.setProperty("hadoop.home.dir", new File(".").getAbsolutePath)
+      bestModel.save(sparkModelDir.getAbsolutePath)
+
+      // Create an MLmodel file so MLflow recognizes the artifact as a model
+      val mlModelFile = new File(modelTempDir, "MLmodel")
+      val mlModelPw = new PrintWriter(mlModelFile)
+      mlModelPw.print(
+        s"""artifact_path: model
+           |flavors:
+           |  spark:
+           |    model_data: sparkml
+           |    pyfunc_predict_fn: predict
+           |  python_function:
+           |    loader_module: mlflow.spark
+           |    model_data: sparkml
+           |    env: null
+           |run_id: $runId
+           |model_uuid: ${java.util.UUID.randomUUID().toString}
+           |""".stripMargin)
+      mlModelPw.close()
+
+      // Upload the entire model directory to MLflow under the "model" artifact path
+      mlflowClient.logArtifacts(runId, modelTempDir, "model")
+      println("  ✅ Spark model logged to MLflow (for serving via FastAPI)")
+
+      // Clean up the local temp directory
+      def deleteRecursively(f: File): Unit = {
+        if (f.isDirectory) f.listFiles().foreach(deleteRecursively)
+        f.delete()
+      }
+      deleteRecursively(modelTempDir)
+
+    } catch {
+      case e: Exception =>
+        println(s"  ℹ️  Model binary save skipped (${e.getClass.getSimpleName}: ${e.getMessage.take(80)})")
+        println("      Model summary JSON still logged. Re-training with Hadoop will enable serving.")
+    }
+
+    println("  ✅ Artifacts logged to MLflow (plots, CSV, JSON, model summary)")
 
     // --- End the MLflow run ---
     mlflowClient.setTerminated(runId, RunStatus.FINISHED, endTime)
@@ -226,7 +294,7 @@ object Trainer {
     trainData: DataFrame, featureNames: Array[String]
   ): Unit = {
     client.logParam(runId, "algorithm", algorithmName)
-    client.logParam(runId, "num_cv_folds", "5")
+    client.logParam(runId, "num_cv_folds", "3")
     client.logParam(runId, "train_test_split", "80/20")
     client.logParam(runId, "feature_count", featureNames.length.toString)
     client.logParam(runId, "training_rows", trainData.count().toString)

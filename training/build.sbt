@@ -27,6 +27,14 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-sql"  % sparkVersion,
   "org.apache.spark" %% "spark-mllib" % sparkVersion,
 
+  // --- Log4j2 override ---
+  // Spark 3.4.4 ships Log4j 2.19.0 which uses SecurityManager (removed
+  // in recent JDK 11 patches). Force upgrade to 2.23.1 which fixes this.
+  "org.apache.logging.log4j" % "log4j-api"        % "2.23.1",
+  "org.apache.logging.log4j" % "log4j-core"       % "2.23.1",
+  "org.apache.logging.log4j" % "log4j-slf4j2-impl" % "2.23.1",
+  "org.apache.logging.log4j" % "log4j-1.2-api"    % "2.23.1",
+
   // --- MLflow Java/Scala client ---
   // This lets us call MLflow's API from Scala to log
   // parameters, metrics, and artifacts.
@@ -64,14 +72,23 @@ assembly / test := {}
 
 // Fork the JVM when running with `sbt run` to avoid
 // classloader issues with Spark
-Compile / run / fork := true
+fork := true
 
 // JVM options for Spark local mode
+// These --add-opens flags allow Spark/Log4j2 to access internal JDK modules
 javaOptions ++= Seq(
+  "-Xmx4g",
   "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
   "--add-opens=java.base/java.lang=ALL-UNNAMED",
   "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
   "--add-opens=java.base/java.io=ALL-UNNAMED",
   "--add-opens=java.base/java.util=ALL-UNNAMED",
-  "--add-opens=java.base/java.nio=ALL-UNNAMED"
+  "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+  "--add-opens=java.base/java.nio=ALL-UNNAMED",
+  "--add-opens=java.base/java.net=ALL-UNNAMED",
+  "--add-opens=java.base/sun.security.action=ALL-UNNAMED",
+  "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED",
+  "--add-exports=java.base/sun.nio.ch=ALL-UNNAMED",
+  s"-Dhadoop.home.dir=${(ThisBuild / baseDirectory).value.getParentFile / "hadoop"}"
 )

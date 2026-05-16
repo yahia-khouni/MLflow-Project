@@ -83,7 +83,7 @@ object Preprocessor {
     val labelIndexer = new StringIndexer()
       .setInputCol("Churn")
       .setOutputCol("label")
-      .setHandleInvalid("keep")  // don't crash on unseen values
+      .setHandleInvalid("error")  // crash immediately if non-Yes/No values appear
     println("  ✅ Label indexer: Churn → label (Yes/No → 1.0/0.0)")
 
     // --- Stage 2: String Indexers for each categorical column ---

@@ -1,0 +1,39 @@
+
+============================================================
+Dataset Exploration Summary
+============================================================
+Total rows:    7043
+Total columns: 20
+
+Churn Distribution:
+    No: 5174 (73.46%)
+    Yes: 1869 (26.54%)
+
+Null Counts:
+    gender                    0
+    SeniorCitizen             0
+    Partner                   0
+    Dependents                0
+    tenure                    0
+    PhoneService              0
+    MultipleLines             0
+    InternetService           0
+    OnlineSecurity            0
+    OnlineBackup              0
+    DeviceProtection          0
+    TechSupport               0
+    StreamingTV               0
+    StreamingMovies           0
+    Contract                  0
+    PaperlessBilling          0
+    PaymentMethod             0
+    MonthlyCharges            0
+    TotalCharges              0
+    Churn                     0
+
+Columns: gender, SeniorCitizen, Partner, Dependents, tenure, PhoneService, MultipleLines, InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod, MonthlyCharges, TotalCharges, Churn
+
+Numeric columns: tenure, MonthlyCharges, TotalCharges, SeniorCitizen
+Categorical columns: gender, Partner, Dependents, PhoneService, MultipleLines, InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod
+============================================================
+    

@@ -35,12 +35,12 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"fastapi\"}[5m]))",
+          "expr": "histogram_quantile(0.95, rate(http_request_duration_highr_seconds_bucket{job=\"fastapi\"}[5m]))",
           "legendFormat": "P95 Latency",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{job=\"fastapi\"}[5m]))",
+          "expr": "histogram_quantile(0.50, rate(http_request_duration_highr_seconds_bucket{job=\"fastapi\"}[5m]))",
           "legendFormat": "P50 Latency",
           "refId": "B"
         }
@@ -69,7 +69,7 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{job=\"fastapi\", status=~\"4..|5..\"}[5m])) / sum(rate(http_requests_total{job=\"fastapi\"}[5m])) * 100",
+          "expr": "sum(rate(http_requests_total{job=\"fastapi\", status=~\"4xx|5xx\"}[5m])) / sum(rate(http_requests_total{job=\"fastapi\"}[5m])) * 100 or vector(0)",
           "legendFormat": "Error Rate",
           "refId": "A"
         }
@@ -131,7 +131,7 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "rate(http_request_duration_seconds_sum{job=\"fastapi\"}[5m]) / rate(http_request_duration_seconds_count{job=\"fastapi\"}[5m])",
+          "expr": "rate(http_request_duration_highr_seconds_sum{job=\"fastapi\"}[5m]) / rate(http_request_duration_highr_seconds_count{job=\"fastapi\"}[5m])",
           "legendFormat": "Avg Latency",
           "refId": "A"
         }
@@ -178,18 +178,22 @@
     },
     {
       "title": "Probability Score Distribution",
-      "description": "Histogram of churn probability scores — shows model confidence spread",
-      "type": "histogram",
+      "description": "Histogram of churn probability scores - shows model confidence spread",
+      "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "rate(churn_probability_score_bucket{job=\"fastapi\"}[5m])",
-          "legendFormat": "{{le}}",
-          "refId": "A",
-          "format": "heatmap"
+          "expr": "increase(churn_probability_score_bucket{job=\"fastapi\"}[5m])",
+          "legendFormat": "le={{le}}",
+          "refId": "A"
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 30, "lineWidth": 1 }
+        }
+      }
     },
     {
       "title": "Batch Size Distribution",
@@ -218,17 +222,17 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
         {
-          "expr": "sum(model_confidence_bucket{level=\"high\"})",
+          "expr": "sum(model_confidence_bucket{level=\"high\", le=\"1.0\"}) or vector(0)",
           "legendFormat": "High",
           "refId": "A"
         },
         {
-          "expr": "sum(model_confidence_bucket{level=\"medium\"})",
+          "expr": "sum(model_confidence_bucket{level=\"medium\", le=\"1.0\"}) or vector(0)",
           "legendFormat": "Medium",
           "refId": "B"
         },
         {
-          "expr": "sum(model_confidence_bucket{level=\"low\"})",
+          "expr": "sum(model_confidence_bucket{level=\"low\", le=\"1.0\"}) or vector(0)",
           "legendFormat": "Low",
           "refId": "C"
         }

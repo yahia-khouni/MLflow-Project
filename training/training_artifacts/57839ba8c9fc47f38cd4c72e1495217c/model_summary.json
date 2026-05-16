@@ -1,0 +1,9 @@
+{
+  "algorithm": "Gradient Boosted Trees",
+  "run_id": "57839ba8c9fc47f38cd4c72e1495217c",
+  "auc_roc": 0.8526431319814429,
+  "accuracy": 0.8052044609665427,
+  "f1_score": 0.7952317852198418,
+  "training_seconds": 61.487,
+  "pipeline_stages": 34
+}

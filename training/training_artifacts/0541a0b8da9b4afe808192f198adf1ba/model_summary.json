@@ -1,0 +1,9 @@
+{
+  "algorithm": "Logistic Regression",
+  "run_id": "0541a0b8da9b4afe808192f198adf1ba",
+  "auc_roc": 0.8470184250820723,
+  "accuracy": 0.8007434944237918,
+  "f1_score": 0.7902683330745028,
+  "training_seconds": 130.467,
+  "pipeline_stages": 34
+}

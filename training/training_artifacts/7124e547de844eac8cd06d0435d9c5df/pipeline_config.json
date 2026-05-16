@@ -1,0 +1,43 @@
+{
+  "algorithm": "Logistic Regression",
+  "num_cv_folds": 5,
+  "train_test_split": "80/20",
+  "param_grid": [
+    {
+      "elasticNetParam": "0.0",
+      "regParam": "0.01"
+    },
+    {
+      "elasticNetParam": "0.5",
+      "regParam": "0.01"
+    },
+    {
+      "elasticNetParam": "1.0",
+      "regParam": "0.01"
+    },
+    {
+      "elasticNetParam": "0.0",
+      "regParam": "0.1"
+    },
+    {
+      "elasticNetParam": "0.5",
+      "regParam": "0.1"
+    },
+    {
+      "elasticNetParam": "1.0",
+      "regParam": "0.1"
+    },
+    {
+      "elasticNetParam": "0.0",
+      "regParam": "0.3"
+    },
+    {
+      "elasticNetParam": "0.5",
+      "regParam": "0.3"
+    },
+    {
+      "elasticNetParam": "1.0",
+      "regParam": "0.3"
+    }
+  ]
+}

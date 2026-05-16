@@ -1,0 +1,9 @@
+{
+  "algorithm": "Random Forest",
+  "run_id": "66bac2967532410ab4b9976760d23066",
+  "auc_roc": 0.8438232751557969,
+  "accuracy": 0.7843866171003717,
+  "f1_score": 0.7559867615747563,
+  "training_seconds": 482.91,
+  "pipeline_stages": 34
+}
